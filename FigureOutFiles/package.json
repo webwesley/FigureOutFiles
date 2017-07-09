@@ -1,13 +1,19 @@
 {
-  "name": "FigureOutFiles",
+  "name": "figureoutfiles",
   "version": "0.0.1",
   "private": true,
   "scripts": {
     "start": "node app.js"
   },
   "dependencies": {
+    "csvtojson": "^1.1.7",
     "ejs": "*",
     "express": "3.2.6",
     "express-fileupload": "^0.1.4"
-  }
+  },
+  "description": "",
+  "main": "app.js",
+  "devDependencies": {},
+  "author": "Wesley Ford",
+  "license": "ISC"
 }

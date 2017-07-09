@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+  	<% include templates/headers.ejs %>
+  
+  <p>
+    <form method="post" enctype="multipart/form-data" action="/">
+    	<input type = "file" name="filename">
+    	<input type="submit" value="upload">
+    </form>
+    </p>
+  </body>
+</html>
