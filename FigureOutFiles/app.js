@@ -13,7 +13,8 @@ var express = require('express')
   , upload = require("express-fileupload")
   , fs = require('fs')
   , uploads = require('./routes/uploads')
-  , csv = require('csvtojson');
+  , csv = require('csvtojson')
+  , returnpage = require('./routes/returnpage');
 
 var app = express();
 
@@ -30,6 +31,7 @@ app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(upload());
 app.use('/uplods', uploads);
+app.use('/returnpage', returnpage);
 
 // development only
 if ('development' === app.get('env')) {
@@ -39,6 +41,7 @@ if ('development' === app.get('env')) {
 app.get('/', routes.index);
 app.get('/users', user.list);
 app.get('/uploads', uploads.display);
+app.get('/returnpage', returnpage.display);
 
 
 app.post("/uploads", function(req, res) {
@@ -63,7 +66,7 @@ app.post("/uploads", function(req, res) {
 				.on('json',(jsonObj)=>{
 				    // combine csv header row and csv line to a json object 
 				    // jsonObj.a ==> 1 or 4 
-					content += JSON.stringify(jsonObj) + '/n'; //writes out json data
+					content += (JSON.stringify(jsonObj) + '\n'); //writes out json data
 				}) 
 				.on('done',(error)=>{
 					if(error){
@@ -83,7 +86,7 @@ app.post("/uploads", function(req, res) {
 				
 			
 
-				res.send("Done!");
+				res.redirect('/returnpage');
 			}
 		});
 		

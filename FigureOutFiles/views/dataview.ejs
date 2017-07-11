@@ -5,9 +5,15 @@
     <link rel='stylesheet' href='/stylesheets/style.css' />
   </head>
   <body>
-  	<% include ./templates/headers %>
+  	<% include templates/headers.ejs %>
   	<p>
-   We really need to put something here
+  	
+  	<ul> 
+  		<% runningData.forEach(function(item) { %>
+  			<li><%= item.Title %></li>
+  		<% }; %>
+  	</ul>
+  	
     </p>
   </body>
 </html>
