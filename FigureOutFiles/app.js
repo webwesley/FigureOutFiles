@@ -14,7 +14,8 @@ var express = require('express')
   , fs = require('fs')
   , uploads = require('./routes/uploads')
   , csv = require('csvtojson')
-  , returnpage = require('./routes/returnpage');
+  , returnpage = require('./routes/returnpage')
+  , dataview = require('./routes/dataview');
 
 var app = express();
 
@@ -32,6 +33,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(upload());
 app.use('/uplods', uploads);
 app.use('/returnpage', returnpage);
+app.use('/dataview', dataview);
 
 // development only
 if ('development' === app.get('env')) {
@@ -42,6 +44,7 @@ app.get('/', routes.index);
 app.get('/users', user.list);
 app.get('/uploads', uploads.display);
 app.get('/returnpage', returnpage.display);
+app.get('/dataview', dataview.display);
 
 
 app.post("/uploads", function(req, res) {
@@ -60,19 +63,20 @@ app.post("/uploads", function(req, res) {
 				res.send("error occured");
 			} else {
 				const csvFilePath='./upload/' + filename; //converts the csv data to json data
-				var content = '';
+				var content = ('{\n"data":[\n');
 				csv()
 				.fromFile(csvFilePath)
 				.on('json',(jsonObj)=>{
 				    // combine csv header row and csv line to a json object 
 				    // jsonObj.a ==> 1 or 4 
-					content += (JSON.stringify(jsonObj) + '\n'); //writes out json data
+					content += (JSON.stringify(jsonObj) + ',\n'); //writes out json data
+					
 				}) 
 				.on('done',(error)=>{
 					if(error){
 						console.log(err);
 					} else {
-						
+						content = content.substring(0, content.length - 2) + '\n]\n}';
 						fs.writeFile("./jsondata/" + filename.replace('.csv', '.json'), content, 'utf8', function (err) {
 						    if (err) {
 						        return console.log(err);
