@@ -1,19 +1,113 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-  	<% include templates/headers.ejs %>
-  	<p>
-  	
-  	<ul> 
-  		<% runningData.data.forEach(function(item) { %>
-  			<li><%= item.Title %></li>
+
+<!-- Styles -->
+<style>
+#chartdiv {
+  width: 100%;
+  height: 500px;
+}
+
+.amcharts-export-menu-top-right {
+  top: 10px;
+  right: 0;
+}
+</style>
+
+<!-- Resources -->
+<script src="https://www.amcharts.com/lib/3/amcharts.js"></script>
+<script src="https://www.amcharts.com/lib/3/serial.js"></script>
+<script src="https://www.amcharts.com/lib/3/plugins/export/export.min.js"></script>
+<link rel="stylesheet" href="https://www.amcharts.com/lib/3/plugins/export/export.css" type="text/css" media="all" />
+<script src="https://www.amcharts.com/lib/3/themes/light.js"></script>
+
+	<% var xAxis = 'Distance' %>
+  	<% var yAxis = 'Elev Gain' %>
+  	<% var chartData = '[' %>
+  	<% var tmp = '' %>
+  	<% runningData.data.forEach(function(item) { %>
+  		<% chartData += ('{ "' +  xAxis +  '" : "' +  item[xAxis] +  '" , "' +  yAxis +  '" : "' +  item[yAxis] +  '"},') %>	
   		<% }); %>
-  	</ul>
-  	
-    </p>
-  </body>
-</html>
+  		<% chartData = (chartData.substring(0, chartData.length-1) + ']') %>
+	<%= chartData%>	
+
+<!-- Chart code -->
+<% include templates/headers.ejs %>
+
+
+
+
+<script>
+var decodeEntities = (function() {
+  // this prevents any overhead from creating the object each time
+  var element = document.createElement('div');
+
+  function decodeHTMLEntities (str) {
+    if(str && typeof str === 'string') {
+      // strip script/html tags
+      str = str.replace(/<script[^>]*>([\S\s]*?)<\/script>/gmi, '');
+      str = str.replace(/<\/?\w(?:[^"'>]|"[^"]*"|'[^']*')*>/gmi, '');
+      element.innerHTML = str;
+      str = element.textContent;
+      element.textContent = '';
+    }
+
+    return str;
+  }
+
+  return decodeHTMLEntities;
+})();
+
+</script>
+
+
+<script>
+var chartData = decodeEntities('<%=chartData %>');
+
+console.log(chartData.type);
+
+window.onload = function() {
+console.log('Started');
+   		
+var chart = AmCharts.makeChart("chartdiv", {
+  "type": "serial",
+  "theme": "light",
+  "marginRight": 70,
+  "dataProvider": chartData,
+  "valueAxes": [{
+    "axisAlpha": 0,
+    "position": "left",
+    "title": "Visitors from name"
+  }],
+  "startDuration": 1,
+  "graphs": [{
+    "balloonText": "<b>[[category]]: [[value]]</b>",
+    "fillColorsField": "color",
+    "fillAlphas": 0.9,
+    "lineAlpha": 0.2,
+    "type": "column",
+    "valueField": "Elev Gain"
+  }],
+  "chartCursor": {
+    "categoryBalloonEnabled": false,
+    "cursorAlpha": 0,
+    "zoomable": false
+  },
+  "categoryField": "Distance",
+  "categoryAxis": {
+    "gridPosition": "start",
+    "labelRotation": 45
+  },
+  "export": {
+    "enabled": true
+  }
+
+});
+
+}
+</script>
+
+<!-- HTML -->
+<div id="chartdiv"></div>			
+
+
+
+

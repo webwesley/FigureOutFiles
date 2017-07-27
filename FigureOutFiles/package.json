@@ -6,10 +6,16 @@
     "start": "node app.js"
   },
   "dependencies": {
+    "amcharts": "file:node_modules/amcharts",
+    "amcharts3": "github:amcharts/amcharts3",
     "csvtojson": "^1.1.7",
     "ejs": "*",
     "express": "3.2.6",
-    "express-fileupload": "^0.1.4"
+    "express-fileupload": "^0.1.4",
+    "mongodb": "file:node_modules/mongodb",
+    "mongoose": "^4.11.1",
+    "path": "^0.12.7",
+    "socket.io": "^2.0.3"
   },
   "description": "",
   "main": "app.js",

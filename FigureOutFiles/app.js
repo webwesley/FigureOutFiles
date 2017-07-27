@@ -20,6 +20,7 @@ var express = require('express')
 var app = express();
 
 
+
 // all environments
 app.set('port', process.env.PORT || 3000);
 app.set('views', __dirname + '/views');
@@ -31,9 +32,12 @@ app.use(express.methodOverride());
 app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(upload());
-app.use('/uplods', uploads);
+app.use('/uploads', uploads);
 app.use('/returnpage', returnpage);
 app.use('/dataview', dataview);
+
+console.log(process.cwd());
+
 
 // development only
 if ('development' === app.get('env')) {
@@ -47,9 +51,10 @@ app.get('/returnpage', returnpage.display);
 app.get('/dataview', dataview.display);
 
 
+
 app.post("/uploads", function(req, res) {
 	if(req.files){
-//		console.log(req.files);
+		console.log(req.files);
 		var file = req.files.filename,
 			filename = file.name;
 //		console.log(file);
@@ -85,12 +90,12 @@ app.post("/uploads", function(req, res) {
 						    console.log("The file was saved!");
 						}); 
 					}
-					
-				  	});
+					});
 				
 			
-
+				app.get('/dataview', dataview.display);
 				res.redirect('/returnpage');
+				res.end();
 			}
 		});
 		
@@ -100,6 +105,8 @@ app.post("/uploads", function(req, res) {
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
+ 
+  
 });
 
 
