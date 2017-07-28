@@ -19,7 +19,7 @@
 <link rel="stylesheet" href="https://www.amcharts.com/lib/3/plugins/export/export.css" type="text/css" media="all" />
 <script src="https://www.amcharts.com/lib/3/themes/light.js"></script>
 
-	<% var xAxis = 'Distance' %>
+	<% var xAxis = 'Avg Pace' %>
   	<% var yAxis = 'Elev Gain' %>
   	<% var chartData = '[' %>
   	<% var tmp = '' %>
@@ -27,7 +27,7 @@
   		<% chartData += ('{ "' +  xAxis +  '" : "' +  item[xAxis] +  '" , "' +  yAxis +  '" : "' +  item[yAxis] +  '"},') %>	
   		<% }); %>
   		<% chartData = (chartData.substring(0, chartData.length-1) + ']') %>
-	<%= chartData%>	
+
 
 <!-- Chart code -->
 <% include templates/headers.ejs %>
@@ -55,16 +55,68 @@ var decodeEntities = (function() {
 
   return decodeHTMLEntities;
 })();
+</script>
+<script>
 
+function convertToMPM(chartData) {
+if(('<%=xAxis%>' == 'Avg Pace') || ('<%=xAxis%>' == 'Best Pace')) {
+chartData.forEach(function(item) {
+	if(item['<%=xAxis%>'].indexOf('.') != '-1') {
+		item['<%=xAxis%>'] = (60 * Math.pow(item['<%=xAxis%>'], -1));
+		var tmp = item['<%=xAxis%>']
+		for(var tmp = item['<%=xAxis%>']; tmp > 1; tmp--){}
+		tmp = Math.round(60 * tmp);
+		console.log(tmp);
+		var str = (JSON.stringify(item['<%=xAxis%>']));
+		var index = str.indexOf('.');
+		str = str.substring(0, index);
+		console.log(str);
+		if(tmp < 10) {
+			item['<%=xAxis%>'] = str + ':0' + tmp;
+		} else {
+			item['<%=xAxis%>'] = str + ':' + tmp;
+		}
+		console.log(item['<%=xAxis%>']);
+		}
+	});
+} if(('<%=yAxis%>' == 'Avg Pace') || ('<%=yAxis%>' == 'Best Pace')) {
+	chartData.forEach(function(item) {
+	if(item['<%=yAxis%>'].indexOf('.') != '-1') {
+		item['<%=yAxis%>'] = (60 * Math.pow(item['<%=yAxis%>'], -1));
+		var tmp = item['<%=yAxis%>']
+		for(var tmp = item['<%=yAxis%>']; tmp > 1; tmp--){}
+		tmp = Math.round(60 * tmp);
+		console.log(tmp);
+		var str = (JSON.stringify(item['<%=yAxis%>']));
+		var index = str.indexOf('.');
+		str = str.substring(0, index);
+		console.log(str);
+		if(tmp < 10) {
+			item['<%=yAxis%>'] = str + ':0' + tmp;
+		} else {
+			item['<%=yAxis%>'] = str + ':' + tmp;
+		}
+		console.log(item['<%=yAxis%>']);
+		console.log('completed');
+		}
+	});
+}
+}
+
+	
 </script>
 
 
 <script>
-var chartData = decodeEntities('<%=chartData %>');
 
-console.log(chartData.type);
 
 window.onload = function() {
+var chartData = JSON.parse(decodeEntities('<%=chartData %>'));
+
+
+convertToMPM(chartData);
+
+console.log(chartData);
 console.log('Started');
    		
 var chart = AmCharts.makeChart("chartdiv", {
@@ -75,7 +127,7 @@ var chart = AmCharts.makeChart("chartdiv", {
   "valueAxes": [{
     "axisAlpha": 0,
     "position": "left",
-    "title": "Visitors from name"
+    "title": "<%=yAxis%>"
   }],
   "startDuration": 1,
   "graphs": [{
@@ -84,14 +136,15 @@ var chart = AmCharts.makeChart("chartdiv", {
     "fillAlphas": 0.9,
     "lineAlpha": 0.2,
     "type": "column",
-    "valueField": "Elev Gain"
+    "valueField": "<%=yAxis%>"
   }],
+  
   "chartCursor": {
     "categoryBalloonEnabled": false,
     "cursorAlpha": 0,
     "zoomable": false
   },
-  "categoryField": "Distance",
+  "categoryField": "<%=xAxis%>",
   "categoryAxis": {
     "gridPosition": "start",
     "labelRotation": 45
