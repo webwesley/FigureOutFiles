@@ -19,12 +19,15 @@
 <link rel="stylesheet" href="https://www.amcharts.com/lib/3/plugins/export/export.css" type="text/css" media="all" />
 <script src="https://www.amcharts.com/lib/3/themes/light.js"></script>
 
-	<% var xAxis = 'Avg Pace' %>
+	<% var xAxis = 'Best Pace' %>
   	<% var yAxis = 'Elev Gain' %>
   	<% var chartData = '[' %>
   	<% var tmp = '' %>
   	<% runningData.data.forEach(function(item) { %>
-  		<% chartData += ('{ "' +  xAxis +  '" : "' +  item[xAxis] +  '" , "' +  yAxis +  '" : "' +  item[yAxis] +  '"},') %>	
+		<% if(item[xAxis] == '--' || item[yAxis] == '--') {return} %>
+	  		<% console.log(item[yAxis]); %>
+	  			<% chartData += ('{ "' +  xAxis +  '" : "' +  item[xAxis] +  '" , "' +  yAxis +  '" : "' +  item[yAxis] +  '"},') %>	
+	  		
   		<% }); %>
   		<% chartData = (chartData.substring(0, chartData.length-1) + ']') %>
 
