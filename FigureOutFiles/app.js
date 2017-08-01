@@ -20,6 +20,9 @@ var express = require('express')
 var app = express();
 
 
+app.locals.xAxis = "";
+app.locals.yAxis = "";
+
 
 // all environments
 app.set('port', process.env.PORT || 3000);
@@ -36,7 +39,6 @@ app.use('/uploads', uploads);
 app.use('/returnpage', returnpage);
 app.use('/dataview', dataview);
 
-console.log(process.cwd());
 
 
 // development only
@@ -49,6 +51,16 @@ app.get('/users', user.list);
 app.get('/uploads', uploads.display);
 app.get('/returnpage', returnpage.display);
 app.get('/dataview', dataview.display);
+
+
+app.post('/dataview', function(req, res){
+	app.locals.xAxis = req.body['X-Axis'];
+	app.locals.yAxis = req.body['Y-Axis'];
+	res.redirect('/dataview');
+	res.end();
+	
+});
+
 
 
 

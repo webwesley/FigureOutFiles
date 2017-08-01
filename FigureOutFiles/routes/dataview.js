@@ -2,6 +2,7 @@
 /*
  * GET dataview page.
  */
+
 var fs = require('fs');
 var filename = './jsondata/Activities.json';
 var runningData;
@@ -21,6 +22,7 @@ var runningData;
 
 
 function getData(){
+	
 	fs.readFile(filename, 'utf8', function (err, data) {
 	  if (err) {
 //		  throw err;
@@ -43,7 +45,7 @@ exports.display = function(req, res){
   res.render('dataview', { 
 	  title: 'Data View', 
 	  runningData : runningData,
-	  xAxis: 'Title'
+	  
 	
   	  });
   };

@@ -1,5 +1,7 @@
+<!DOCTYPE html>
+<html>
+  <head>
 
-<!-- Styles -->
 <style>
 #chartdiv {
   width: 100%;
@@ -19,22 +21,46 @@
 <link rel="stylesheet" href="https://www.amcharts.com/lib/3/plugins/export/export.css" type="text/css" media="all" />
 <script src="https://www.amcharts.com/lib/3/themes/light.js"></script>
 
-	<% var xAxis = 'Best Pace' %>
-  	<% var yAxis = 'Elev Gain' %>
+	
+	<% xAxis %>
+	<% yAxis %>
   	<% var chartData = '[' %>
   	<% var tmp = '' %>
   	<% runningData.data.forEach(function(item) { %>
 		<% if(item[xAxis] == '--' || item[yAxis] == '--') {return} %>
-	  		<% console.log(item[yAxis]); %>
+	  		
 	  			<% chartData += ('{ "' +  xAxis +  '" : "' +  item[xAxis] +  '" , "' +  yAxis +  '" : "' +  item[yAxis] +  '"},') %>	
 	  		
   		<% }); %>
   		<% chartData = (chartData.substring(0, chartData.length-1) + ']') %>
 
-
+</head>
 <!-- Chart code -->
+<body>
 <% include templates/headers.ejs %>
 
+<p>
+X-Axis:  	 	&nbsp; 	&nbsp; 	&nbsp;&nbsp;  	&nbsp; 	&nbsp; Y-Axis:
+<form method = "post" action = "/dataview" enctype="multipart/form-data">
+<select name="X-Axis">
+  <option value="Best Pace">Best Pace</option>
+  <option value="Avg Pace">Avg Pace</option> 
+  <option value="Elev Gain">Elev Gain</option>
+  <option value="Elev Loss">Elev Loss</option>
+  
+</select>
+
+<select name="Y-Axis">
+ <option value="Best Pace">Best Pace</option>
+  <option value="Avg Pace">Avg Pace</option> 
+  <option value="Elev Gain">Elev Gain</option>
+  <option value="Elev Loss">Elev Loss</option>
+  </select>
+<br><br>
+<input type ="submit" value="Submit">
+</form>
+
+</p>
 
 
 
@@ -69,17 +95,17 @@ chartData.forEach(function(item) {
 		var tmp = item['<%=xAxis%>']
 		for(var tmp = item['<%=xAxis%>']; tmp > 1; tmp--){}
 		tmp = Math.round(60 * tmp);
-		console.log(tmp);
+		
 		var str = (JSON.stringify(item['<%=xAxis%>']));
 		var index = str.indexOf('.');
 		str = str.substring(0, index);
-		console.log(str);
+	
 		if(tmp < 10) {
 			item['<%=xAxis%>'] = str + ':0' + tmp;
 		} else {
 			item['<%=xAxis%>'] = str + ':' + tmp;
 		}
-		console.log(item['<%=xAxis%>']);
+		
 		}
 	});
 } if(('<%=yAxis%>' == 'Avg Pace') || ('<%=yAxis%>' == 'Best Pace')) {
@@ -89,18 +115,17 @@ chartData.forEach(function(item) {
 		var tmp = item['<%=yAxis%>']
 		for(var tmp = item['<%=yAxis%>']; tmp > 1; tmp--){}
 		tmp = Math.round(60 * tmp);
-		console.log(tmp);
+
 		var str = (JSON.stringify(item['<%=yAxis%>']));
 		var index = str.indexOf('.');
 		str = str.substring(0, index);
-		console.log(str);
+	
 		if(tmp < 10) {
 			item['<%=yAxis%>'] = str + ':0' + tmp;
 		} else {
 			item['<%=yAxis%>'] = str + ':' + tmp;
 		}
-		console.log(item['<%=yAxis%>']);
-		console.log('completed');
+		
 		}
 	});
 }
@@ -109,18 +134,35 @@ chartData.forEach(function(item) {
 	
 </script>
 
+<script>
+
+function convertToSec(pace) {
+	if(pace.indexOf(':') != '-1') {
+		var min = pace.substring(0, pace.indexOf(':'));
+		var sec = pace.substring(pace.indexOf(':') + 1);
+		return (60 * min) + sec;
+	}
+	return pace;
+
+}
+</script>
+
 
 <script>
 
 
 window.onload = function() {
+
 var chartData = JSON.parse(decodeEntities('<%=chartData %>'));
-
-
 convertToMPM(chartData);
 
-console.log(chartData);
-console.log('Started');
+chartData.sort(function(a, b) {
+
+	return convertToSec(a['<%=xAxis%>']) - convertToSec(b['<%=xAxis%>']);
+});
+
+
+
    		
 var chart = AmCharts.makeChart("chartdiv", {
   "type": "serial",
@@ -150,7 +192,7 @@ var chart = AmCharts.makeChart("chartdiv", {
   "categoryField": "<%=xAxis%>",
   "categoryAxis": {
     "gridPosition": "start",
-    "labelRotation": 45
+    "labelRotation": 30   //changes angle of x-axis lables
   },
   "export": {
     "enabled": true
@@ -161,9 +203,10 @@ var chart = AmCharts.makeChart("chartdiv", {
 }
 </script>
 
-<!-- HTML -->
-<div id="chartdiv"></div>			
 
+<div id="chartdiv"></div>			
+	</body>
+</html>
 
 
 
