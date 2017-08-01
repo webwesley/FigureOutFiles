@@ -40,21 +40,24 @@
 <% include templates/headers.ejs %>
 
 <p>
-X-Axis:  	 	&nbsp; 	&nbsp; 	&nbsp;&nbsp;  	&nbsp; 	&nbsp; Y-Axis:
+X-Axis:  	&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; Y-Axis:
 <form method = "post" action = "/dataview" enctype="multipart/form-data">
 <select name="X-Axis">
+	<option value="Date">Date</option>
   <option value="Best Pace">Best Pace</option>
-  <option value="Avg Pace">Avg Pace</option> 
-  <option value="Elev Gain">Elev Gain</option>
-  <option value="Elev Loss">Elev Loss</option>
+  <option value="Avg Pace">Average Pace</option> 
+  <option value="Elev Gain">Elevation Gain</option>
+  <option value="Elev Loss">Elevation Loss</option>
+  <option value="Avg Stride Length">Average Stride Length</option>
   
 </select>
 
 <select name="Y-Axis">
  <option value="Best Pace">Best Pace</option>
-  <option value="Avg Pace">Avg Pace</option> 
+  <option value="Avg Pace">Average Pace</option> 
   <option value="Elev Gain">Elev Gain</option>
   <option value="Elev Loss">Elev Loss</option>
+  <option value="Avg Stride Length">Average Stride Length</option>
   </select>
 <br><br>
 <input type ="submit" value="Submit">
