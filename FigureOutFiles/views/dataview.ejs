@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-
+ <link rel='stylesheet' href='/stylesheets/style.css' />
 <style>
 #chartdiv {
   width: 100%;
@@ -21,7 +21,7 @@
 <link rel="stylesheet" href="https://www.amcharts.com/lib/3/plugins/export/export.css" type="text/css" media="all" />
 <script src="https://www.amcharts.com/lib/3/themes/light.js"></script>
 
-	
+	<% sortMethod %>
 	<% xAxis %>
 	<% yAxis %>
   	<% var chartData = '[' %>
@@ -49,7 +49,7 @@ X-Axis:  	&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; Y-Axis:
   <option value="Elev Gain">Elevation Gain</option>
   <option value="Elev Loss">Elevation Loss</option>
   <option value="Avg Stride Length">Average Stride Length</option>
-  
+   <option value=" Distance">A  Distance</option>
 </select>
 
 <select name="Y-Axis">
@@ -58,8 +58,13 @@ X-Axis:  	&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; Y-Axis:
   <option value="Elev Gain">Elev Gain</option>
   <option value="Elev Loss">Elev Loss</option>
   <option value="Avg Stride Length">Average Stride Length</option>
+  <option value=" Distance">A  Distance</option>
+  Distance
   </select>
-<br><br>
+  <input type="radio" name="sortMethod" value="sort by Date" checked> Sort By Date
+  <input type="radio" name="sortMethod" value="AO"> Sort in Ascending Order
+  <br>  
+<br>
 <input type ="submit" value="Submit">
 </form>
 
@@ -158,14 +163,11 @@ window.onload = function() {
 
 var chartData = JSON.parse(decodeEntities('<%=chartData %>'));
 convertToMPM(chartData);
-
-chartData.sort(function(a, b) {
-
+if('<%=sortMethod%>' == 'AO'){
+	chartData.sort(function(a, b) {
 	return convertToSec(a['<%=xAxis%>']) - convertToSec(b['<%=xAxis%>']);
-});
-
-
-
+	});
+} 
    		
 var chart = AmCharts.makeChart("chartdiv", {
   "type": "serial",

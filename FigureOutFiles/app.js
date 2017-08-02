@@ -22,6 +22,7 @@ var app = express();
 
 app.locals.xAxis = "";
 app.locals.yAxis = "";
+app.locals.sortMethod = "";
 
 
 // all environments
@@ -56,6 +57,8 @@ app.get('/dataview', dataview.display);
 app.post('/dataview', function(req, res){
 	app.locals.xAxis = req.body['X-Axis'];
 	app.locals.yAxis = req.body['Y-Axis'];
+	app.locals.sortMethod = req.body.sortMethod;
+	
 	res.redirect('/dataview');
 	res.end();
 	
