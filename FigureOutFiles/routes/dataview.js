@@ -2,10 +2,12 @@
 /*
  * GET dataview page.
  */
+/*jshint esversion: 6 */
 
 var fs = require('fs');
 var filename = './jsondata/Activities.json';
 var runningData;
+
 
 
 
@@ -33,6 +35,15 @@ function getData(){
 	  console.log('All done');
 	}
 	});
+
+//	try{
+//		sendYUnits = units.get(yAxis);
+//		sendXUnits = units.get(xAxis);
+//		console.log(sendYUnits);
+//		console.log(sendXUnits);
+//	} catch(err) {
+//		console.log('x and y axis are not defined yet');
+//	}
 }
 try{
 getData();

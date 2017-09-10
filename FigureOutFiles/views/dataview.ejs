@@ -13,16 +13,19 @@
   right: 0;
 }
 </style>
-
+ <title><%= title %></title>
 <!-- Resources -->
 <script src="https://www.amcharts.com/lib/3/amcharts.js"></script>
 <script src="https://www.amcharts.com/lib/3/serial.js"></script>
 <script src="https://www.amcharts.com/lib/3/plugins/export/export.min.js"></script>
+<script src="https://www.amcharts.com/lib/3/xy.js"></script>
 <link rel="stylesheet" href="https://www.amcharts.com/lib/3/plugins/export/export.css" type="text/css" media="all" />
 <script src="https://www.amcharts.com/lib/3/themes/light.js"></script>
 
+	
 	<% sortMethod %>
 	<% xAxis %>
+	
 	<% yAxis %>
   	<% var chartData = '[' %>
   	<% var tmp = '' %>
@@ -49,7 +52,8 @@ X-Axis:  	&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; Y-Axis:
   <option value="Elev Gain">Elevation Gain</option>
   <option value="Elev Loss">Elevation Loss</option>
   <option value="Avg Stride Length">Average Stride Length</option>
-   <option value=" Distance">A  Distance</option>
+   <option value=" Distance">Distance</option>
+   <option value="Avg Cadence">Avg Cadence</option>
 </select>
 
 <select name="Y-Axis">
@@ -58,18 +62,31 @@ X-Axis:  	&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; Y-Axis:
   <option value="Elev Gain">Elev Gain</option>
   <option value="Elev Loss">Elev Loss</option>
   <option value="Avg Stride Length">Average Stride Length</option>
-  <option value=" Distance">A  Distance</option>
+  <option value="Distance"> Distance</option>
+  <option value="Avg Cadence">Avg Cadence</option>
   Distance
   </select>
   <input type="radio" name="sortMethod" value="sort by Date" checked> Sort By Date
   <input type="radio" name="sortMethod" value="AO"> Sort in Ascending Order
   <br>  
 <br>
-<input type ="submit" value="Submit">
+<input type ="submit" value="Plot">
 </form>
 
 </p>
+<script>
+var keyValueY  = [['Date', ' '], ['Best Pace', '(Sec/Mi)'], ['Avg Pace', '(Sec/Mi)'], ['Elev Gain', '(Feet)'], ['Elev Loss', '(Feet)' ],
+	['Distance', '(Miles)'], ['Avg Stride Length', '(Meters)'], ['Avg Cadence', '(Steps/Min)']];
+var keyValueX = [['Date', ' '], ['Best Pace', '(Min/Mi)'], ['Avg Pace', '(Min/Mi)'], ['Elev Gain', '(Feet)'], ['Elev Loss', '(Feet)' ],
+	['Distance', '(Miles)'], ['Avg Stride Length', '(Meters)'], ['Avg Cadence', '(Steps/Min)']];
+var keyValueUpperLimit = [['Avg Stride Length', '2.5']];
+var keyValueLowerLimit = [['Best Pace', '128'], ['Avg Pace', '128']];
 
+var lowerLimits = new Map(keyValueLowerLimit);
+var upperLimits = new Map(keyValueUpperLimit);
+var unitsY = new Map(keyValueY);
+var unitsX = new Map(keyValueX);
+</script>
 
 
 <script>
@@ -129,9 +146,9 @@ chartData.forEach(function(item) {
 		str = str.substring(0, index);
 	
 		if(tmp < 10) {
-			item['<%=yAxis%>'] = str + ':0' + tmp;
+			item['<%=yAxis%>'] = (str + ':0' + tmp);
 		} else {
-			item['<%=yAxis%>'] = str + ':' + tmp;
+			item['<%=yAxis%>'] = (str + ':' + tmp);
 		}
 		
 		}
@@ -145,16 +162,30 @@ chartData.forEach(function(item) {
 <script>
 
 function convertToSec(pace) {
-	if(pace.indexOf(':') != '-1') {
+	if(pace.indexOf(':') !== '-1') {
 		var min = pace.substring(0, pace.indexOf(':'));
+	
 		var sec = pace.substring(pace.indexOf(':') + 1);
-		return (60 * min) + sec;
+		
+		var paceInSec = (Number(60*min) + Number(sec));
+		
+		return (paceInSec);
 	}
 	return pace;
 
 }
 </script>
-
+<script>
+function cleanData(data, lowerLimit, upperLimit){
+console.log(lowerLimit + "/" + upperLimit);
+	data.forEach(function(item) {
+		if(item['<%=yAxis%>'] <= lowerLimit || item['<%=yAxis%>'] > upperLimit) {
+		delete item['<%=yAxis%>'];
+		} 
+		return data;
+	});
+}
+</script>
 
 <script>
 
@@ -163,12 +194,33 @@ window.onload = function() {
 
 var chartData = JSON.parse(decodeEntities('<%=chartData %>'));
 convertToMPM(chartData);
+if(('<%=yAxis%>' == 'Avg Pace') || ('<%=yAxis%>' == 'Best Pace')) {
+	chartData.forEach(function(item){
+	console.log(item['<%=yAxis%>']);
+		item['<%=yAxis%>'] = convertToSec(item['<%=yAxis%>']);
+	});														
+}
+
+
 if('<%=sortMethod%>' == 'AO'){
 	chartData.sort(function(a, b) {
 	return convertToSec(a['<%=xAxis%>']) - convertToSec(b['<%=xAxis%>']);
 	});
+
 } 
-   		
+try{
+var lowerLimit = lowerLimits.get('<%=yAxis%>');
+} catch(err) {
+var lowerLimit = 0;
+}
+try{
+var upperLimit = upperLimits.get('<%=yAxis%>');
+} catch(err) {
+var upperLimit = 10000;
+}
+
+var newData = cleanData(chartData, lowerLimit, upperLimit);
+
 var chart = AmCharts.makeChart("chartdiv", {
   "type": "serial",
   "theme": "light",
@@ -177,7 +229,7 @@ var chart = AmCharts.makeChart("chartdiv", {
   "valueAxes": [{
     "axisAlpha": 0,
     "position": "left",
-    "title": "<%=yAxis%>"
+    "title": ("<%=yAxis%> " + unitsY.get("<%=yAxis%>"))
   }],
   "startDuration": 1,
   "graphs": [{
@@ -199,13 +251,22 @@ var chart = AmCharts.makeChart("chartdiv", {
     "gridPosition": "start",
     "labelRotation": 30   //changes angle of x-axis lables
   },
+   "allLabels": [{
+    "text": ("<%=xAxis%> " + unitsX.get("<%=xAxis%>")),
+    "x": "!900",
+    "y": "!18",
+    "width": "50%",
+    "size": 15,
+    "bold": true,
+    "align": "right"
+  }],
   "export": {
     "enabled": true
   }
 
 });
-
 }
+
 </script>
 
 

@@ -84,11 +84,12 @@ app.post("/uploads", function(req, res) {
 			} else {
 				const csvFilePath='./upload/' + filename; //converts the csv data to json data
 				var content = ('{\n"data":[\n');
+				var maxCad = 0;
+				var avgCad = 0;
 				csv()
 				.fromFile(csvFilePath)
 				.on('json',(jsonObj)=>{
-				    // combine csv header row and csv line to a json object 
-				    // jsonObj.a ==> 1 or 4 
+				
 					content += (JSON.stringify(jsonObj) + ',\n'); //writes out json data
 					
 				}) 
