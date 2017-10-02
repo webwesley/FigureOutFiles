@@ -25,8 +25,9 @@
 	
 	<% sortMethod %>
 	<% xAxis %>
-	
 	<% yAxis %>
+	<% minValue %>
+	<% maxValue %>
   	<% var chartData = '[' %>
   	<% var tmp = '' %>
   	<% runningData.data.forEach(function(item) { %>
@@ -43,7 +44,11 @@
 <% include templates/headers.ejs %>
 
 <p>
-X-Axis:  	&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; Y-Axis:
+X-Axis:  	&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; Y-Axis: 
+&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; 
+&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; Minimum Value
+&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; Maximum Value
+
 <form method = "post" action = "/dataview" enctype="multipart/form-data">
 <select name="X-Axis">
 	<option value="Date">Date</option>
@@ -52,7 +57,7 @@ X-Axis:  	&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; Y-Axis:
   <option value="Elev Gain">Elevation Gain</option>
   <option value="Elev Loss">Elevation Loss</option>
   <option value="Avg Stride Length">Average Stride Length</option>
-   <option value=" Distance">Distance</option>
+   <option value="Distance">Distance</option>
    <option value="Avg Cadence">Avg Cadence</option>
 </select>
 
@@ -62,12 +67,15 @@ X-Axis:  	&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; Y-Axis:
   <option value="Elev Gain">Elev Gain</option>
   <option value="Elev Loss">Elev Loss</option>
   <option value="Avg Stride Length">Average Stride Length</option>
-  <option value="Distance"> Distance</option>
+  <option value="Distance">Distance</option>
   <option value="Avg Cadence">Avg Cadence</option>
-  Distance
+  
   </select>
-  <input type="radio" name="sortMethod" value="sort by Date" checked> Sort By Date
-  <input type="radio" name="sortMethod" value="AO"> Sort in Ascending Order
+  <input type="radio" name="sortMethod" value="AO" checked> Sort in Ascending Order
+  <input type="radio" name="sortMethod" value="sort by Date" > Sort By Date
+  <input type="number" name="minValue" value="Minimum Value"> 
+  <input type="number" name="maxValue" value="Maximum Value"> 
+ 
   <br>  
 <br>
 <input type ="submit" value="Plot">
@@ -80,7 +88,7 @@ var keyValueY  = [['Date', ' '], ['Best Pace', '(Sec/Mi)'], ['Avg Pace', '(Sec/M
 var keyValueX = [['Date', ' '], ['Best Pace', '(Min/Mi)'], ['Avg Pace', '(Min/Mi)'], ['Elev Gain', '(Feet)'], ['Elev Loss', '(Feet)' ],
 	['Distance', '(Miles)'], ['Avg Stride Length', '(Meters)'], ['Avg Cadence', '(Steps/Min)']];
 var keyValueUpperLimit = [['Avg Stride Length', '2.5']];
-var keyValueLowerLimit = [['Best Pace', '128'], ['Avg Pace', '128']];
+var keyValueLowerLimit = [['Best Pace', '128'], ['Avg Pace', '128'], ['Avg Stride Length', '0.5']];
 
 var lowerLimits = new Map(keyValueLowerLimit);
 var upperLimits = new Map(keyValueUpperLimit);
@@ -178,12 +186,24 @@ function convertToSec(pace) {
 <script>
 function cleanData(data, lowerLimit, upperLimit){
 console.log(lowerLimit + "/" + upperLimit);
+console.log(data);
+var counter = 0;
 	data.forEach(function(item) {
-		if(item['<%=yAxis%>'] <= lowerLimit || item['<%=yAxis%>'] > upperLimit) {
-		delete item['<%=yAxis%>'];
+	console.log('<%=minValue%>');
+	console.log('<%=maxValue%>');
+	console.log(item['<%=yAxis%>']);
+	console.log(item['<%=yAxis%>'] < '<%=minValue%>'); 
+	console.log(item['<%=yAxis%>'] > parseInt('<%=maxValue%>', 10));
+		if((item['<%=yAxis%>'] <= lowerLimit || item['<%=yAxis%>'] > upperLimit) || (item['<%=yAxis%>'] <= parseInt('<%=minValue%>', 10) || item['<%=yAxis%>'] >= parseInt('<%=maxValue%>', 10))) {
+			
+			data.splice(counter, 1);
+		
+		
+			console.log("Item Deleted");
 		} 
-		return data;
+		counter++;
 	});
+	return data;
 }
 </script>
 
@@ -196,7 +216,7 @@ var chartData = JSON.parse(decodeEntities('<%=chartData %>'));
 convertToMPM(chartData);
 if(('<%=yAxis%>' == 'Avg Pace') || ('<%=yAxis%>' == 'Best Pace')) {
 	chartData.forEach(function(item){
-	console.log(item['<%=yAxis%>']);
+	
 		item['<%=yAxis%>'] = convertToSec(item['<%=yAxis%>']);
 	});														
 }
@@ -225,7 +245,7 @@ var chart = AmCharts.makeChart("chartdiv", {
   "type": "serial",
   "theme": "light",
   "marginRight": 70,
-  "dataProvider": chartData,
+  "dataProvider": newData,
   "valueAxes": [{
     "axisAlpha": 0,
     "position": "left",

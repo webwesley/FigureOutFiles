@@ -12,17 +12,6 @@ var runningData;
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 function getData(){
 	
 	fs.readFile(filename, 'utf8', function (err, data) {
@@ -36,15 +25,7 @@ function getData(){
 	}
 	});
 
-//	try{
-//		sendYUnits = units.get(yAxis);
-//		sendXUnits = units.get(xAxis);
-//		console.log(sendYUnits);
-//		console.log(sendXUnits);
-//	} catch(err) {
-//		console.log('x and y axis are not defined yet');
-//	}
-}
+
 try{
 getData();
 } catch(err){

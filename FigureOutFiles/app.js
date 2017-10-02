@@ -23,6 +23,8 @@ var app = express();
 app.locals.xAxis = "";
 app.locals.yAxis = "";
 app.locals.sortMethod = "";
+app.locals.minValue = "0";
+app.locals.maxValue = "10000";
 
 
 // all environments
@@ -58,6 +60,16 @@ app.post('/dataview', function(req, res){
 	app.locals.xAxis = req.body['X-Axis'];
 	app.locals.yAxis = req.body['Y-Axis'];
 	app.locals.sortMethod = req.body.sortMethod;
+	
+	app.locals.minValue = req.body.minValue;
+	
+	
+	app.locals.maxValue = req.body.maxValue;
+
+	console.log(app.locals.minValue + " " + app.locals.maxValue);
+		
+	
+	
 	
 	res.redirect('/dataview');
 	res.end();
