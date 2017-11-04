@@ -24,7 +24,7 @@ function getData(){
 	  console.log('All done');
 	}
 	});
-
+}
 
 try{
 getData();
@@ -41,4 +41,20 @@ exports.display = function(req, res){
 	
   	  });
   };
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   
